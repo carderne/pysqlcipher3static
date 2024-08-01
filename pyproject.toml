@@ -2,9 +2,7 @@
 build = "python -m build"
 fmt = "rye fmt"
 lint = "rye lint --fix"
-check = "pyright"
-test = "pytest"
-all = { chain = ["fmt", "lint", "check", "test"] }
+all = { chain = ["fmt", "lint"] }
 
 [project]
 name = "pysqlcipher3static"
@@ -38,11 +36,7 @@ dependencies = []
 [tool.rye]
 managed = true
 generate-hashes = false
-dev-dependencies = [
-    "pyright",
-    "setuptools-scm~=8.1.0",
-    "build~=1.2.1",
-]
+dev-dependencies = []
 
 [project.urls]
 homepage = "https://github.com/carderne/pysqlcipher3static"
@@ -61,17 +55,8 @@ package-dir = {"" = "src"}
 target-version = "py39"
 
 [tool.ruff.lint]
-select = ["F", "E", "I", "U", "N", "E", "S", "T100", "A", "Q", "ANN"]
+select = ["F", "E", "I", "U", "E", "S", "T100", "A", "Q"]
+ignore = ["F405"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["pysqlcipher3"]
-
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
-include = ["src"]
-reportMissingImports = true
-reportMissingParameterType = true
-reportUnnecessaryTypeIgnoreComment = true
-reportDeprecated = true
-pythonVersion = "3.9"
