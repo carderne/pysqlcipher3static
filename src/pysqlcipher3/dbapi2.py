@@ -3,7 +3,7 @@
 #
 # Copyright (C) David Riggleman <davidriggleman@gmail.com>
 # Copyright (C) Kali Kaneko <kali@futeisha.org>
-# Copyright (C) 2010 Gerhard Häring <gh@ghaering.de>
+# Copyright (C) 2010 Gerhard HÃ¤ring <gh@ghaering.de>
 #
 # This file is part of pysqlite.
 #
@@ -27,8 +27,7 @@ import collections.abc
 import datetime
 import time
 
-from pysqlcipher3._sqlite3 import *
-
+from pysqlcipher3._sqlite3 import *  # noqa
 
 paramstyle = "qmark"
 threadsafety = 1
@@ -77,19 +76,18 @@ def register_adapters_and_converters():
         timepart_full = timepart.split(b".")
         hours, minutes, seconds = map(int, timepart_full[0].split(b":"))
         if len(timepart_full) == 2:
-            microseconds = int('{:0<6.6}'.format(timepart_full[1].decode()))
+            microseconds = int(f"{timepart_full[1].decode():0<6.6}")
         else:
             microseconds = 0
 
-        val = datetime.datetime(year, month, day, hours, minutes,
-                                seconds, microseconds)
+        val = datetime.datetime(year, month, day, hours, minutes, seconds, microseconds)
         return val
-
 
     register_adapter(datetime.date, adapt_date)
     register_adapter(datetime.datetime, adapt_datetime)
     register_converter("date", convert_date)
     register_converter("timestamp", convert_timestamp)
+
 
 register_adapters_and_converters()
 
