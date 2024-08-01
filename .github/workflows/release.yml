@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: build ${{ matrix.os }} ${{ matrix.py }}
+    name: build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -34,32 +34,28 @@ jobs:
           name: cibw-wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
-      - name: create sdist
-        run: |
-          pip install build
-          python -m build --sdist
-
-      - uses: actions/upload-artifact@v4
-        # only do this once
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          name: sdist
-          path: "dist/*.tar.gz"
-
-  upload:
-    needs: [build]
-    environment: release
-    # if: startsWith(github.ref, 'refs/tags/')
+  sdist:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v4
-      with:
-        merge-multiple: true
+      - uses: actions/checkout@v4
+      - run: pipx run build --sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: dist/*.tar.gz
 
-    - name: Copy artifacts to dist/ folder
-      run: |
-        mkdir -p dist/
-        mv *.tar.gz dist/
-        mv *.whl dist/
+  upload:
+    needs: [build, sdist]
+    runs-on: ubuntu-latest
+    environment: release
+    # if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
 
-    - uses: pypa/gh-action-pypi-publish@v1
+      - uses: pypa/gh-action-pypi-publish@release/v1
